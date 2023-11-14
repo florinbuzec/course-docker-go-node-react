@@ -12,7 +12,7 @@ services:
     ports:
       - 80:8080
     networks:
-      - course-01-network
+      - frontend
 
   db:
     image: postgres:15.1-alpine
@@ -25,10 +25,12 @@ services:
     ports:
       - 5432:5432
     networks:
-      - course-01-network
+      - backend
   
   api-node:
-    image: api-node:7
+    image: api-node
+    build:
+      context: api-node/
     container_name: api-node
     hostname: api-node
     restart: unless-stopped
@@ -40,10 +42,13 @@ services:
     ports:
       - 3000:3000
     networks:
-      - course-01-network
+      - frontend
+      - backend
 
   api-golang:
-    image: api-golang:8
+    image: api-golang
+    build:
+      context: api-golang/
     container_name: api-golang
     hostname: api-golang
     restart: unless-stopped
@@ -54,10 +59,12 @@ services:
     ports:
       - 8080:8080
     networks:
-      - course-01-network
+      - frontend
+      - backend
 
 volumes:
   pgdata:
 networks:
-  course-01-network:
+  frontend:
+  backend:
   
