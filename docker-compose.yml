@@ -1,0 +1,63 @@
+version: "3"
+services:
+  client-react-nginx:
+    image: client-react
+    build:
+      context: client-react/
+      dockerfile: Dockerfile
+    container_name: client-react-nginx
+    hostname: client-react-nginx
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - 80:8080
+    networks:
+      - course-01-network
+
+  db:
+    image: postgres:15.1-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=foobarbaz
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - course-01-network
+  
+  api-node:
+    image: api-node:7
+    container_name: api-node
+    hostname: api-node
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=3000
+    ports:
+      - 3000:3000
+    networks:
+      - course-01-network
+
+  api-golang:
+    image: api-golang:8
+    container_name: api-golang
+    hostname: api-golang
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - 8080:8080
+    networks:
+      - course-01-network
+
+volumes:
+  pgdata:
+networks:
+  course-01-network:
+  
